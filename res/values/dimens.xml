@@ -1,0 +1,14 @@
+<resources>
+
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    
+    <integer name="anim_full_time">300</integer>
+    <integer name="anim_half_time">150</integer>
+    
+    <dimen name="music_type_button_size">17.5dp</dimen>
+    <dimen name="music_info_lefttop_size">15dp</dimen>
+    <dimen name="music_info_leftbottom_size">12.5dp</dimen>
+
+</resources>

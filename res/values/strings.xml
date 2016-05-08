@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">EasyMusic</string>
+    
+    <string name="local_music_title">Music</string>
+    <string name="local_album_title">Album</string>
+    <string name="local_artist_title">Artist</string>
+
+</resources>
