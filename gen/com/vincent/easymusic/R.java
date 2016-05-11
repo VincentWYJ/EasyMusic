@@ -67,8 +67,8 @@ public final class R {
     }
     public static final class layout {
         public static final int easymusic_main_layout=0x7f030000;
-        public static final int musicinfo_layout=0x7f030001;
-        public static final int musicinfo_list_fragment=0x7f030002;
+        public static final int musicinfo_item_layout=0x7f030001;
+        public static final int musicinfo_list_layout=0x7f030002;
     }
     public static final class menu {
         public static final int main=0x7f090000;

@@ -58,8 +58,7 @@ public class MusicInfo {
         isPodcast = bundle.getInt(MediaStore.Audio.Media.IS_PODCAST) == 1;
         isAlarm = bundle.getInt(MediaStore.Audio.Media.IS_ALARM) == 1;
         isMusic = bundle.getInt(MediaStore.Audio.Media.IS_MUSIC) == 1;
-        isNotification = bundle.getInt(MediaStore.Audio.Media.IS_NOTIFICATION) == 1;
-                   
+        isNotification = bundle.getInt(MediaStore.Audio.Media.IS_NOTIFICATION) == 1;     
     }
   
     public int getId() {

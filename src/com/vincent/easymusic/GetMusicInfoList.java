@@ -75,15 +75,8 @@ public class GetMusicInfoList {
                 }
             }
             
-            /*
-        	 * The if condition used to only access mp3 music files, but change file suffix from .mp3 to .mp4 can also accessed, 
-        	 * because that just changed the music's path(MediaStore.Audio.Media.DATA) but not display name
-        	 */
-            //String musicDiaplayName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
-            //if(musicDiaplayName != null && musicDiaplayName.endsWith(".mp3")){
-	            MusicInfo audio = new MusicInfo(bundle);
-	            audioList.add(audio);
-            //}
+            MusicInfo audio = new MusicInfo(bundle);
+            audioList.add(audio);
         }
         
         cursor.close();
