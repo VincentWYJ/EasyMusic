@@ -16,4 +16,5 @@ A easy music playing tool
 2. add calling MediaPlayer.pause() in onDestroy()
 3. change calling MediaPLayer.release() to reset() in MusicPlay()
 4. change calling MediaPLayer.prepare() to prerareAsync() in MusicPlay(), need first listening MediaPlayer.OnPreparedListener
+5. add 3 title views to viewTitleContainter as viewPagerContainter to control background color
  

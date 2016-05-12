@@ -58,15 +58,18 @@ public class EasyMusicMainActivity extends Activity{
 	private ListView musicInfoList = null;
 	private ListView albumInfoList = null;
 	private ListView artistInfoList = null;
+	private LayoutInflater layoutInflater = null;
 	private List<Map<String, Object>> musicMapList = null;
 	private String albumName = null;
 	private String artistName = null;
 	private ArrayList<View> viewPagerContainter = null;
+	private ArrayList<View> viewTitleContainter = null;
 	private SimpleAdapter musicInfoListAdapter = null;
 	private DecimalFormat decimalFormat = new DecimalFormat("00");
 	private Collator collator = SetElementComparator.getInstance(Locale.CHINA);
 	
 	private int positionPlay = 0;
+	private int indexViewPager = 0;
 	
 	private boolean isMusicPlaying = false;
 	private boolean isGetMusicListFlag = true;
@@ -100,6 +103,8 @@ public class EasyMusicMainActivity extends Activity{
         
         musicMapList = new ArrayList<Map<String, Object>>();
         viewPagerContainter = new ArrayList<View>();
+        viewTitleContainter = new ArrayList<View>();
+        layoutInflater = getLayoutInflater();
         
         initMusicViews();
         
@@ -116,34 +121,36 @@ public class EasyMusicMainActivity extends Activity{
     
     //action for title button click
     public void LocalTypeSelection(View localView){
-    	localMusicTitle.setBackgroundColor(buttonNormalColor);
-		localAlbumTitle.setBackgroundColor(buttonNormalColor);
-		localArtistTitle.setBackgroundColor(buttonNormalColor);
-		if(localView.getId() == R.id.local_music_title){
- 			setPagerMusicListAdapter();
- 			viewPager.setCurrentItem(0);
- 			localMusicTitle.setBackgroundColor(buttonPressColor);
- 		}else if(localView.getId() == R.id.local_album_title){
- 			setPagerAlbumListAdapter();
- 			localAlbumTitle.setBackgroundColor(buttonPressColor);
- 			viewPager.setCurrentItem(1);
- 		}else if(localView.getId() == R.id.local_artist_title){
- 			setPagerArtistListAdapter();
- 			viewPager.setCurrentItem(2);
- 			localArtistTitle.setBackgroundColor(buttonPressColor);
- 		}
+    	for(int i=0; i<viewTitleContainter.size(); ++i){
+    		viewTitleContainter.get(i).setBackgroundColor(buttonNormalColor);
+    	}
+    	int viewId = localView.getId();
+    	switch (viewId) {
+		case R.id.local_music_title:
+			setPagerMusicListAdapter();
+ 			indexViewPager = 0;
+			break;
+		case R.id.local_album_title:
+			setPagerAlbumListAdapter();
+ 			indexViewPager = 1;
+			break;
+		case R.id.local_artist_title:
+			setPagerArtistListAdapter();
+ 			indexViewPager = 2;
+			break;
+		default:
+			break;
+		}
+		viewPager.setCurrentItem(indexViewPager);
+		viewTitleContainter.get(indexViewPager).setBackgroundColor(buttonPressColor);
     }
     
 	public void initMusicViews(){
     	viewPager = (ViewPager) findViewById(R.id.musicinfo_list_fragment);
 
-    	pagerMusic = LayoutInflater.from(mContext).inflate(R.layout.musicinfo_list_layout, null);
-        pagerAlbum = LayoutInflater.from(mContext).inflate(R.layout.musicinfo_list_layout, null);
-        pagerArtist = LayoutInflater.from(mContext).inflate(R.layout.musicinfo_list_layout, null);
-          
-        viewPagerContainter.add(pagerMusic);
-        viewPagerContainter.add(pagerAlbum);
-        viewPagerContainter.add(pagerArtist);
+    	pagerMusic = layoutInflater.inflate(R.layout.musicinfo_list_layout, null);
+        pagerAlbum = layoutInflater.inflate(R.layout.musicinfo_list_layout, null);
+        pagerArtist = layoutInflater.inflate(R.layout.musicinfo_list_layout, null);
         
         localMusicTitle = (Button)findViewById(R.id.local_music_title);
         localAlbumTitle = (Button)findViewById(R.id.local_album_title);
@@ -158,7 +165,14 @@ public class EasyMusicMainActivity extends Activity{
         albumInfoList = (ListView) pagerAlbum.findViewById(R.id.music_info_list);
         artistInfoList = (ListView) pagerArtist.findViewById(R.id.music_info_list);
         
-        localMusicTitle.setBackgroundColor(buttonPressColor);
+        
+        viewPagerContainter.add(pagerMusic);
+        viewPagerContainter.add(pagerAlbum);
+        viewPagerContainter.add(pagerArtist);
+        viewTitleContainter.add(localMusicTitle);
+        viewTitleContainter.add(localAlbumTitle);
+        viewTitleContainter.add(localArtistTitle);
+        viewTitleContainter.get(indexViewPager).setBackgroundColor(buttonPressColor);
         musicPlaySeekBar.setProgress(0);
         musicTimePlay.setText("0:00");
         musicTimeEnd.setText("0:00");
@@ -214,19 +228,24 @@ public class EasyMusicMainActivity extends Activity{
 
         	@Override
         	public void onPageSelected(int arg0){
-        		localMusicTitle.setBackgroundColor(buttonNormalColor);
-        		localAlbumTitle.setBackgroundColor(buttonNormalColor);
-        		localArtistTitle.setBackgroundColor(buttonNormalColor);
-        		if(arg0 == 0){
-         			setPagerMusicListAdapter();
-         			localMusicTitle.setBackgroundColor(buttonPressColor);
-         		}else if(arg0 == 1){
-         			setPagerAlbumListAdapter();
-         			localAlbumTitle.setBackgroundColor(buttonPressColor);
-         		}else if(arg0 == 2){
-         			setPagerArtistListAdapter();
-         			localArtistTitle.setBackgroundColor(buttonPressColor);
-         		}
+        		for(int i=0; i<viewTitleContainter.size(); ++i){
+            		viewTitleContainter.get(i).setBackgroundColor(buttonNormalColor);
+            	}
+        		indexViewPager = arg0;
+            	switch (arg0) {
+        		case 0:
+        			setPagerMusicListAdapter();
+        			break;
+        		case 1:
+        			setPagerAlbumListAdapter();
+        			break;
+        		case 2:
+        			setPagerArtistListAdapter();
+        			break;
+        		default:
+        			break;
+        		}
+        		viewTitleContainter.get(indexViewPager).setBackgroundColor(buttonPressColor);
         	}
         });
     }
@@ -575,6 +594,8 @@ public class EasyMusicMainActivity extends Activity{
     	musicMapList = null;
     	viewPagerContainter.clear();
     	viewPagerContainter = null;
+    	viewTitleContainter.clear();
+    	viewTitleContainter = null;
     	
     	if(mediaPlayer != null){
     		mediaPlayer.pause();
