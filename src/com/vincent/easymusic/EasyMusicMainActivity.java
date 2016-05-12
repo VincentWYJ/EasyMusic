@@ -19,6 +19,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -41,7 +42,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 @SuppressLint({ "ResourceAsColor", "InflateParams" })
-public class EasyMusicMainActivity extends Activity {
+public class EasyMusicMainActivity extends Activity{
 	
 	private Context mContext = null;
 	
@@ -87,7 +88,7 @@ public class EasyMusicMainActivity extends Activity {
 	private View pagerArtist = null;
 	
 	@Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         
         setContentView(R.layout.easymusic_main_layout);
@@ -164,36 +165,36 @@ public class EasyMusicMainActivity extends Activity {
     }
     
     public void setViewPagerAdapter(){
-    	 viewPager.setAdapter(new PagerAdapter() {
+    	 viewPager.setAdapter(new PagerAdapter(){
 
          	@Override
-         	public int getCount() {
+         	public int getCount(){
          		return viewPagerContainter.size();
          	}
 
          	@Override
-         	public void destroyItem(ViewGroup container, int position, Object object) {
+         	public void destroyItem(ViewGroup container, int position, Object object){
          		((ViewPager) container).removeView(viewPagerContainter.get(position));
          	}
 
          	@Override
-         	public Object instantiateItem(ViewGroup container, int position) {
+         	public Object instantiateItem(ViewGroup container, int position){
          		((ViewPager) container).addView(viewPagerContainter.get(position));
          		return viewPagerContainter.get(position);
          	}
 
          	@Override
-         	public boolean isViewFromObject(View arg0, Object arg1) {
+         	public boolean isViewFromObject(View arg0, Object arg1){
          		return arg0 == arg1;
          	}
 
          	@Override
-         	public int getItemPosition(Object object) {
+         	public int getItemPosition(Object object){
          		return super.getItemPosition(object);
          	}
 
          	@Override
-         	public CharSequence getPageTitle(int position) {
+         	public CharSequence getPageTitle(int position){
          		return null;
          	}
          });
@@ -201,18 +202,18 @@ public class EasyMusicMainActivity extends Activity {
     
     @SuppressWarnings("deprecation")
 	public void setViewPagerChangeListener(){
-    	viewPager.setOnPageChangeListener(new OnPageChangeListener() {
+    	viewPager.setOnPageChangeListener(new OnPageChangeListener(){
     		
         	@Override
-        	public void onPageScrollStateChanged(int arg0) {
+        	public void onPageScrollStateChanged(int arg0){
         	}
 
         	@Override
-        	public void onPageScrolled(int arg0, float arg1, int arg2) {
+        	public void onPageScrolled(int arg0, float arg1, int arg2){
         	}
 
         	@Override
-        	public void onPageSelected(int arg0) {
+        	public void onPageSelected(int arg0){
         		localMusicTitle.setBackgroundColor(buttonNormalColor);
         		localAlbumTitle.setBackgroundColor(buttonNormalColor);
         		localArtistTitle.setBackgroundColor(buttonNormalColor);
@@ -238,10 +239,10 @@ public class EasyMusicMainActivity extends Activity {
     	getMusicInfoListAdapter();
 
     	musicInfoList.setAdapter(musicInfoListAdapter);
-    	musicInfoList.setOnItemClickListener(new OnItemClickListener() {
+    	musicInfoList.setOnItemClickListener(new OnItemClickListener(){
 
     		@Override
-    		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    		public void onItemClick(AdapterView<?> parent, View view, int position, long id){
     			MusicPlay(position);
     		}
     	});
@@ -255,19 +256,19 @@ public class EasyMusicMainActivity extends Activity {
      	getAlbumInfoListAdapter();
      	
      	albumInfoList.setAdapter(musicInfoListAdapter);
-     	albumInfoList.setOnItemClickListener(new OnItemClickListener() {
+     	albumInfoList.setOnItemClickListener(new OnItemClickListener(){
      		
      		@Override
-     		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+     		public void onItemClick(AdapterView<?> parent, View view, int position, long id){
      			isGetMusicListFlag = true;
      			albumName = (String) musicMapList.get(position).get("album");
      			getMusicInfos(MediaStore.Audio.Media.ALBUM+"=?", new String[]{albumName}, musicSortOrder);
      			getMusicInfoListAdapter();
      			albumInfoList.setAdapter(musicInfoListAdapter);
-     			albumInfoList.setOnItemClickListener(new OnItemClickListener() {
+     			albumInfoList.setOnItemClickListener(new OnItemClickListener(){
      				
      				@Override
-     				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+     				public void onItemClick(AdapterView<?> parent, View view, int position, long id){
      					MusicPlay(position);
      				}
      			});
@@ -321,19 +322,19 @@ public class EasyMusicMainActivity extends Activity {
      	getArtistInfoListAdapter();
     	
     	artistInfoList.setAdapter(musicInfoListAdapter);
-    	artistInfoList.setOnItemClickListener(new OnItemClickListener() {
+    	artistInfoList.setOnItemClickListener(new OnItemClickListener(){
         	
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id){
 				isGetMusicListFlag = true;
 				artistName = (String) musicMapList.get(position).get("artist");
 				getMusicInfos(MediaStore.Audio.Media.ARTIST+"=?", new String[]{artistName}, musicSortOrder);
 				getMusicInfoListAdapter();
 				artistInfoList.setAdapter(musicInfoListAdapter);
-				artistInfoList.setOnItemClickListener(new OnItemClickListener() {
+				artistInfoList.setOnItemClickListener(new OnItemClickListener(){
 		        	
 					@Override
-					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					public void onItemClick(AdapterView<?> parent, View view, int position, long id){
 						MusicPlay(position);
 					}
 				});
@@ -378,21 +379,21 @@ public class EasyMusicMainActivity extends Activity {
     }
     
     public void setSeekBarOnClickListener(){
-    	musicPlaySeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+    	musicPlaySeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
 
 			@Override
-			public void onStopTrackingTouch(SeekBar seekBar) {
+			public void onStopTrackingTouch(SeekBar seekBar){
 				if(mediaPlayer != null){
 					mediaPlayer.seekTo(seekBar.getProgress());
 				}
 			}
 			
 			@Override
-			public void onStartTrackingTouch(SeekBar seekBar) {
+			public void onStartTrackingTouch(SeekBar seekBar){
 			}
 			
 			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
 				float duration = progress/60.0f/1000.0f;
 	        	int pre = (int)duration;
 	        	int suf = (int)((duration-pre)*60);
@@ -402,17 +403,17 @@ public class EasyMusicMainActivity extends Activity {
     }
     
     public void setSeekBarMoveListener(){
-    	new Thread(new Runnable() {
+    	new Thread(new Runnable(){
 			
 			@Override
-			public void run() {
-				while (true) {
-	            	try {
+			public void run(){
+				while (true){
+	            	try{
 						Thread.sleep(500);
 						if(isMusicPlaying){
 							musicPlaySeekBar.setProgress(mediaPlayer.getCurrentPosition());
 						}
-					} catch (InterruptedException e) {
+					} catch (InterruptedException e){
 						e.printStackTrace();
 					}
 	            }
@@ -448,7 +449,7 @@ public class EasyMusicMainActivity extends Activity {
     
     public void MusicPlayControl(View playView){
     	int id = playView.getId();
-    	switch (id) {
+    	switch (id){
 		case R.id.music_play_next:
 			MusicPlay((positionPlay+1)%musicInfos.size());
 			break;
@@ -474,7 +475,7 @@ public class EasyMusicMainActivity extends Activity {
 			break;
 		}
     }
-    
+	
     public void MusicPlay(int position){
     	isMusicPlaying = false;
     	int totalTime = musicInfos.get(position).getDuration();
@@ -490,21 +491,27 @@ public class EasyMusicMainActivity extends Activity {
 			return;
 		}
 		uri = Uri.fromFile(songFile);
-		try {
+		try{
 			if(mediaPlayer != null){
 				mediaPlayer.stop();
-				mediaPlayer.release();
-				mediaPlayer = null;
+				mediaPlayer.reset();
+			}else{
+				mediaPlayer = new MediaPlayer();
 			}
-			mediaPlayer = new MediaPlayer();
 			mediaPlayer.setDataSource(mContext, uri);
-			mediaPlayer.prepare();
-			mediaPlayer.start();
-			isMusicPlaying = true;
-			setMusicViewInfos();
-		} catch (IllegalStateException e) {
+			mediaPlayer.setOnPreparedListener(new OnPreparedListener() {
+				
+				@Override
+				public void onPrepared(MediaPlayer mp) {
+					mediaPlayer.start();
+					isMusicPlaying = true;
+					setMusicViewInfos();
+				}
+			});
+			mediaPlayer.prepareAsync();
+		} catch (IllegalStateException e){
 			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (IOException e){
 			e.printStackTrace();
 		}
     }
@@ -512,10 +519,10 @@ public class EasyMusicMainActivity extends Activity {
     public void setMusicViewInfos(){
     	musicPlayName.setText(musicInfos.get(positionPlay).getTitle());
         musicTimeEnd.setText((CharSequence) musicMapList.get(positionPlay).get("duration"));
-		mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
+		mediaPlayer.setOnCompletionListener(new OnCompletionListener(){
 			
 			@Override
-			public void onCompletion(MediaPlayer mp) {
+			public void onCompletion(MediaPlayer mp){
 				musicPlayPause.setBackgroundResource(R.drawable.music_to_pause);
 				String str = musicTimeEnd.getText().toString();
 				int result = Integer.parseInt(str.substring(str.indexOf(":")+1));
@@ -539,7 +546,7 @@ public class EasyMusicMainActivity extends Activity {
     }
     
     public class SetElementComparator extends Collator
-    {
+	{
     	@Override
     	public int compare(String s1, String s2)
     	{
@@ -557,7 +564,7 @@ public class EasyMusicMainActivity extends Activity {
     	{
     		return 0;
     	}
-    }
+	}
     
     @Override
     protected void onDestroy(){
@@ -570,6 +577,7 @@ public class EasyMusicMainActivity extends Activity {
     	viewPagerContainter = null;
     	
     	if(mediaPlayer != null){
+    		mediaPlayer.pause();
 			mediaPlayer.stop();
 			mediaPlayer.release();
 			mediaPlayer = null;
