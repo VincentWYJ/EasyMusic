@@ -11,8 +11,9 @@ public final class R {
     public static final class attr {
     }
     public static final class color {
-        public static final int button_normal=0x7f040001;
-        public static final int button_pressed=0x7f040000;
+        public static final int button_normal_color=0x7f040001;
+        public static final int button_press_color=0x7f040000;
+        public static final int cursor_color=0x7f040002;
     }
     public static final class dimen {
         /**  Default screen margins, per the Android Design guidelines. 
@@ -43,23 +44,26 @@ public final class R {
         public static final int music_to_start=0x7f020010;
     }
     public static final class id {
-        public static final int left_bottom=0x7f0a000d;
-        public static final int left_top=0x7f0a000c;
+        public static final int cursor=0x7f0a0003;
+        public static final int cursor1=0x7f0a0004;
+        public static final int cursor2=0x7f0a0005;
+        public static final int left_bottom=0x7f0a0010;
+        public static final int left_top=0x7f0a000f;
         public static final int local_album_title=0x7f0a0001;
         public static final int local_artist_title=0x7f0a0002;
         public static final int local_music_title=0x7f0a0000;
-        public static final int menu_item_share=0x7f0a0010;
-        public static final int music_info_list=0x7f0a000f;
-        public static final int music_play_name=0x7f0a0007;
-        public static final int music_play_next=0x7f0a000b;
-        public static final int music_play_pause=0x7f0a000a;
-        public static final int music_play_pre=0x7f0a0009;
-        public static final int music_play_seekbar=0x7f0a0005;
-        public static final int music_playparams_layout=0x7f0a0004;
-        public static final int music_time_end=0x7f0a0008;
-        public static final int music_time_play=0x7f0a0006;
-        public static final int musicinfo_list_fragment=0x7f0a0003;
-        public static final int right=0x7f0a000e;
+        public static final int menu_item_share=0x7f0a0013;
+        public static final int music_info_list=0x7f0a0012;
+        public static final int music_play_name=0x7f0a000a;
+        public static final int music_play_next=0x7f0a000e;
+        public static final int music_play_pause=0x7f0a000d;
+        public static final int music_play_pre=0x7f0a000c;
+        public static final int music_play_seekbar=0x7f0a0008;
+        public static final int music_playparams_layout=0x7f0a0007;
+        public static final int music_time_end=0x7f0a000b;
+        public static final int music_time_play=0x7f0a0009;
+        public static final int musicinfo_list_fragment=0x7f0a0006;
+        public static final int right=0x7f0a0011;
     }
     public static final class integer {
         public static final int anim_full_time=0x7f060000;
@@ -68,7 +72,8 @@ public final class R {
     public static final class layout {
         public static final int easymusic_main_layout=0x7f030000;
         public static final int musicinfo_item_layout=0x7f030001;
-        public static final int musicinfo_list_layout=0x7f030002;
+        public static final int musicinfo_list_fragment=0x7f030002;
+        public static final int musicinfo_list_layout=0x7f030003;
     }
     public static final class menu {
         public static final int main=0x7f090000;

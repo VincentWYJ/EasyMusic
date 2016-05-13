@@ -1,4 +1,4 @@
-package com.vincent.easymusic;
+package com.vincent.easymusic.info;
 
 import android.os.Bundle;
 import android.provider.MediaStore;

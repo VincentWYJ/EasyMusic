@@ -2,93 +2,73 @@ package com.vincent.easymusic;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.CollationKey;
-import java.text.Collator;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import com.vincent.easymusic.R;
+import com.vincent.easymusic.info.MusicInfo;
+import com.vincent.easymusic.utils.Utils;
+import com.vincent.easymusic.fragment.*;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.content.Context;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.SeekBar;
-import android.widget.SimpleAdapter;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
 @SuppressLint({ "ResourceAsColor", "InflateParams" })
-public class EasyMusicMainActivity extends Activity{
+public class EasyMusicMainActivity extends FragmentActivity{
 	
-	private Context mContext = null;
+	public static Uri uri = null;
+	public static String songPath = null;
+	public static MediaPlayer mediaPlayer = null;
 	
-	private String musicSortOrder = MediaStore.Audio.Media.TITLE_KEY+" ASC";
-	private String albumSortOrder = null;  //MediaStore.Audio.Media.ALBUM_KEY+" ASC";
-	private String artistSortOrder = null;  //MediaStore.Audio.Media.ARTIST_KEY+" ASC";
+	public static List<MusicInfo> musicInfo = null;
+	public static ArrayList<View> viewTitleContainter = null;
 	
-	private Uri uri = null;
-	private String songPath = null;
-	private MediaPlayer mediaPlayer = null;
+	public static List<Fragment> fragmentList = null;
+	public static Fragment localMusicListFragment = null;
+	public static Fragment localAlbumListFragment = null;
+	public static Fragment localArtistListFragment = null;
 	
-	private List<MusicInfo> musicInfos = null;
-	private ListView musicInfoList = null;
-	private ListView albumInfoList = null;
-	private ListView artistInfoList = null;
-	private LayoutInflater layoutInflater = null;
-	private List<Map<String, Object>> musicMapList = null;
-	private String albumName = null;
-	private String artistName = null;
-	private ArrayList<View> viewPagerContainter = null;
-	private ArrayList<View> viewTitleContainter = null;
-	private SimpleAdapter musicInfoListAdapter = null;
-	private DecimalFormat decimalFormat = new DecimalFormat("00");
-	private Collator collator = SetElementComparator.getInstance(Locale.CHINA);
+	public static boolean isMusicPlaying = false;
+	public static int positionPlay = 0;
+	public static int indexViewPager = 0;
 	
-	private int positionPlay = 0;
-	private int indexViewPager = 0;
+	public static int buttonPressColor = 0;
+	public static int buttonNormalColor = 0;
 	
-	private boolean isMusicPlaying = false;
-	private boolean isGetMusicListFlag = true;
-	
-	private int buttonPressColor = 0;
-	private int buttonNormalColor = 0;
-	
-	private Button localMusicTitle = null;
-	private Button localAlbumTitle = null;
-	private Button localArtistTitle = null;
-	private SeekBar musicPlaySeekBar;
-	private TextView musicPlayName = null;
-	private TextView musicTimePlay = null;
-	private TextView musicTimeEnd = null;
-	private ImageView musicPlayPause = null;
-	private ViewPager viewPager = null;
-	private View pagerMusic = null;
-	private View pagerAlbum = null;
-	private View pagerArtist = null;
+	private static int offsetCursor = 0;
+	private static int widthCursor = 0;
+
+	private static ImageView imageViewCursor = null;
+	private static SeekBar musicPlaySeekBar;
+	private static TextView musicPlayName = null;
+	private static TextView musicTimePlay = null;
+	private static TextView musicTimeEnd = null;
+	private static ImageView musicPlayPause = null;
+	private static ViewPager viewPager = null;
+	private static FragmentAdapter fragmentAdapter = null;  
 	
 	@Override
     protected void onCreate(Bundle savedInstanceState){
@@ -96,24 +76,21 @@ public class EasyMusicMainActivity extends Activity{
         
         setContentView(R.layout.easymusic_main_layout);
         
-        mContext = this;
+        Utils.mContext = this;
         
-        buttonNormalColor = getResources().getColor(R.color.button_normal);
-        buttonPressColor = getResources().getColor(R.color.button_pressed);
+        isMusicPlaying = false;
+    	positionPlay = 0;
+    	indexViewPager = 0;
         
-        musicMapList = new ArrayList<Map<String, Object>>();
-        viewPagerContainter = new ArrayList<View>();
         viewTitleContainter = new ArrayList<View>();
-        layoutInflater = getLayoutInflater();
+        fragmentList = new ArrayList<Fragment>();
+        localMusicListFragment = new LocalMusicListFragment();
+        localAlbumListFragment = new LocalAlbumListFragment();
+        localArtistListFragment = new LocalArtistListFragment();
         
         initMusicViews();
-        
-        setViewPagerAdapter();
+
         setViewPagerChangeListener();
-        
-        setPagerMusicListAdapter();
-        //setPagerAlbumListAdapter();
-        //setPagerArtistListAdapter();
 
         setSeekBarOnClickListener();
 		setSeekBarMoveListener();
@@ -121,101 +98,59 @@ public class EasyMusicMainActivity extends Activity{
     
     //action for title button click
     public void LocalTypeSelection(View localView){
-    	for(int i=0; i<viewTitleContainter.size(); ++i){
-    		viewTitleContainter.get(i).setBackgroundColor(buttonNormalColor);
-    	}
     	int viewId = localView.getId();
     	switch (viewId) {
 		case R.id.local_music_title:
-			setPagerMusicListAdapter();
- 			indexViewPager = 0;
+			indexViewPager = 0;
 			break;
 		case R.id.local_album_title:
-			setPagerAlbumListAdapter();
- 			indexViewPager = 1;
+			indexViewPager = 1;
 			break;
 		case R.id.local_artist_title:
-			setPagerArtistListAdapter();
- 			indexViewPager = 2;
+			indexViewPager = 2;
 			break;
 		default:
 			break;
 		}
 		viewPager.setCurrentItem(indexViewPager);
-		viewTitleContainter.get(indexViewPager).setBackgroundColor(buttonPressColor);
     }
     
 	public void initMusicViews(){
     	viewPager = (ViewPager) findViewById(R.id.musicinfo_list_fragment);
-
-    	pagerMusic = layoutInflater.inflate(R.layout.musicinfo_list_layout, null);
-        pagerAlbum = layoutInflater.inflate(R.layout.musicinfo_list_layout, null);
-        pagerArtist = layoutInflater.inflate(R.layout.musicinfo_list_layout, null);
         
-        localMusicTitle = (Button)findViewById(R.id.local_music_title);
-        localAlbumTitle = (Button)findViewById(R.id.local_album_title);
-        localArtistTitle = (Button)findViewById(R.id.local_artist_title);
         musicPlaySeekBar = (SeekBar)findViewById(R.id.music_play_seekbar);
         musicTimePlay = (TextView)findViewById(R.id.music_time_play);
         musicPlayName = (TextView)findViewById(R.id.music_play_name);
         musicTimeEnd = (TextView)findViewById(R.id.music_time_end);
         musicPlayPause = (ImageView)findViewById(R.id.music_play_pause);
+       
+        fragmentList.add(localMusicListFragment);
+        fragmentList.add(localAlbumListFragment);
+        fragmentList.add(localArtistListFragment);
+
+        fragmentAdapter = new FragmentAdapter(getSupportFragmentManager(), fragmentList);
+        viewPager.setAdapter(fragmentAdapter);
         
-        musicInfoList = (ListView) pagerMusic.findViewById(R.id.music_info_list);
-        albumInfoList = (ListView) pagerAlbum.findViewById(R.id.music_info_list);
-        artistInfoList = (ListView) pagerArtist.findViewById(R.id.music_info_list);
+        imageViewCursor= (ImageView) findViewById(R.id.cursor);
         
-        
-        viewPagerContainter.add(pagerMusic);
-        viewPagerContainter.add(pagerAlbum);
-        viewPagerContainter.add(pagerArtist);
-        viewTitleContainter.add(localMusicTitle);
-        viewTitleContainter.add(localAlbumTitle);
-        viewTitleContainter.add(localArtistTitle);
-        viewTitleContainter.get(indexViewPager).setBackgroundColor(buttonPressColor);
+        widthCursor = imageViewCursor.getWidth();
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        int screenW = dm.widthPixels;
+        offsetCursor = (screenW / fragmentList.size() - widthCursor - 4) / 2;
+        Matrix matrix = new Matrix();
+        matrix.postTranslate(offsetCursor, 0);
+        imageViewCursor.setImageMatrix(matrix);
+
         musicPlaySeekBar.setProgress(0);
         musicTimePlay.setText("0:00");
         musicTimeEnd.setText("0:00");
     }
     
-    public void setViewPagerAdapter(){
-    	 viewPager.setAdapter(new PagerAdapter(){
-
-         	@Override
-         	public int getCount(){
-         		return viewPagerContainter.size();
-         	}
-
-         	@Override
-         	public void destroyItem(ViewGroup container, int position, Object object){
-         		((ViewPager) container).removeView(viewPagerContainter.get(position));
-         	}
-
-         	@Override
-         	public Object instantiateItem(ViewGroup container, int position){
-         		((ViewPager) container).addView(viewPagerContainter.get(position));
-         		return viewPagerContainter.get(position);
-         	}
-
-         	@Override
-         	public boolean isViewFromObject(View arg0, Object arg1){
-         		return arg0 == arg1;
-         	}
-
-         	@Override
-         	public int getItemPosition(Object object){
-         		return super.getItemPosition(object);
-         	}
-
-         	@Override
-         	public CharSequence getPageTitle(int position){
-         		return null;
-         	}
-         });
-    }
-    
     @SuppressWarnings("deprecation")
 	public void setViewPagerChangeListener(){
+    	final int baseOffset = offsetCursor * 2 + widthCursor;
+    	
     	viewPager.setOnPageChangeListener(new OnPageChangeListener(){
     		
         	@Override
@@ -228,173 +163,14 @@ public class EasyMusicMainActivity extends Activity{
 
         	@Override
         	public void onPageSelected(int arg0){
-        		for(int i=0; i<viewTitleContainter.size(); ++i){
-            		viewTitleContainter.get(i).setBackgroundColor(buttonNormalColor);
-            	}
+        		Animation animation = new TranslateAnimation(baseOffset*indexViewPager, baseOffset*arg0, 0, 0);
+                animation.setFillAfter(true);
+                animation.setDuration(300);
+                imageViewCursor.startAnimation(animation);
+                
         		indexViewPager = arg0;
-            	switch (arg0) {
-        		case 0:
-        			setPagerMusicListAdapter();
-        			break;
-        		case 1:
-        			setPagerAlbumListAdapter();
-        			break;
-        		case 2:
-        			setPagerArtistListAdapter();
-        			break;
-        		default:
-        			break;
-        		}
-        		viewTitleContainter.get(indexViewPager).setBackgroundColor(buttonPressColor);
         	}
         });
-    }
-    
-    public void setPagerMusicListAdapter(){
-    	isGetMusicListFlag = true;
-    	
-    	getMusicInfos(null, null, musicSortOrder);
-        
-    	getMusicInfoListAdapter();
-
-    	musicInfoList.setAdapter(musicInfoListAdapter);
-    	musicInfoList.setOnItemClickListener(new OnItemClickListener(){
-
-    		@Override
-    		public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-    			MusicPlay(position);
-    		}
-    	});
-    }
-    
-    public void setPagerAlbumListAdapter(){
-    	isGetMusicListFlag = false;
-
-     	getAlbumInfos(null, null, albumSortOrder);
-
-     	getAlbumInfoListAdapter();
-     	
-     	albumInfoList.setAdapter(musicInfoListAdapter);
-     	albumInfoList.setOnItemClickListener(new OnItemClickListener(){
-     		
-     		@Override
-     		public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-     			isGetMusicListFlag = true;
-     			albumName = (String) musicMapList.get(position).get("album");
-     			getMusicInfos(MediaStore.Audio.Media.ALBUM+"=?", new String[]{albumName}, musicSortOrder);
-     			getMusicInfoListAdapter();
-     			albumInfoList.setAdapter(musicInfoListAdapter);
-     			albumInfoList.setOnItemClickListener(new OnItemClickListener(){
-     				
-     				@Override
-     				public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-     					MusicPlay(position);
-     				}
-     			});
-     		}
-     	});
-    }
-    
-    public void getAlbumInfos(String selection, String[] selectionArgs, String sortOrder){
-    	getMusicInfos(selection, selectionArgs, sortOrder);
-    	
-    	musicMapList.clear();
-    	
-    	Set<String>albumNameSet = new TreeSet<String>(collator);
-    	for(int i=0; i<musicInfos.size(); ++i){
-    		albumName = musicInfos.get(i).getAlbum();
-    		albumNameSet.add(albumName);
-    	}
-    	
-    	int albumCountArray[] = new int[albumNameSet.size()];
-    	int index = 0;
-    	for(Iterator<String>iter = albumNameSet.iterator(); iter.hasNext();){
-    		String albumNameInSet = iter.next();
-    		String albumArtist = null;
-    		for(int i=0; i<musicInfos.size(); ++i){
-    			albumName = musicInfos.get(i).getAlbum();
-    			if(albumNameInSet.equals(albumName)){
-    				albumCountArray[index] += 1;
-    				albumArtist = musicInfos.get(i).getArtist();
-    			}
-    		}
-    		
-    		Map<String, Object> map = new HashMap<String, Object>();
-    		map.put("album", albumNameInSet);
-    		map.put("count", albumCountArray[index]+" 首 - "+albumArtist);
-    		musicMapList.add(map);
-    		++index;
-    	}
-    }
-
-    public void getAlbumInfoListAdapter(){
-    	musicInfoListAdapter = new SimpleAdapter(mContext, musicMapList, R.layout.musicinfo_item_layout,
-    			new String[]{"album", "count"},
-    			new int[]{R.id.left_top, R.id.left_bottom});
-    }
-    
-    public void setPagerArtistListAdapter(){
-    	isGetMusicListFlag = false;
-
-    	getArtistInfos(null, null, artistSortOrder);
-
-     	getArtistInfoListAdapter();
-    	
-    	artistInfoList.setAdapter(musicInfoListAdapter);
-    	artistInfoList.setOnItemClickListener(new OnItemClickListener(){
-        	
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-				isGetMusicListFlag = true;
-				artistName = (String) musicMapList.get(position).get("artist");
-				getMusicInfos(MediaStore.Audio.Media.ARTIST+"=?", new String[]{artistName}, musicSortOrder);
-				getMusicInfoListAdapter();
-				artistInfoList.setAdapter(musicInfoListAdapter);
-				artistInfoList.setOnItemClickListener(new OnItemClickListener(){
-		        	
-					@Override
-					public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-						MusicPlay(position);
-					}
-				});
-			}
-		});
-    }
-    
-    public void getArtistInfos(String selection, String[] selectionArgs, String sortOrder){
-    	getMusicInfos(selection, selectionArgs, sortOrder);
-    	
-    	musicMapList.clear();
-    	
-    	Set<String>artistNameSet = new TreeSet<String>(collator);
-    	for(int i=0; i<musicInfos.size(); ++i){
-        	artistName = musicInfos.get(i).getArtist();
-        	artistNameSet.add(artistName);
-        }
-    	
-    	int artistCountArray[] = new int[artistNameSet.size()];
-    	int index = 0;
-    	for(Iterator<String>iter = artistNameSet.iterator(); iter.hasNext();){
-    		String artistNameInSet = iter.next();
-    		for(int i=0; i<musicInfos.size(); ++i){
-            	artistName = musicInfos.get(i).getArtist();
-            	if(artistNameInSet.equals(artistName)){
-            		artistCountArray[index] += 1;
-            	}
-            }
-    		
-    		Map<String, Object> map = new HashMap<String, Object>();
-    		map.put("artist", artistNameInSet);
-    		map.put("count", artistCountArray[index]+" 首 ");
-    		musicMapList.add(map);
-        	++index;
-    	}
-    }
-    
-    public void getArtistInfoListAdapter(){
-    	musicInfoListAdapter = new SimpleAdapter(mContext, musicMapList, R.layout.musicinfo_item_layout,
-                new String[]{"artist", "count"},
-                new int[]{R.id.left_top, R.id.left_bottom});
     }
     
     public void setSeekBarOnClickListener(){
@@ -416,7 +192,7 @@ public class EasyMusicMainActivity extends Activity{
 				float duration = progress/60.0f/1000.0f;
 	        	int pre = (int)duration;
 	        	int suf = (int)((duration-pre)*60);
-	        	musicTimePlay.setText(String.valueOf(pre)+":"+decimalFormat.format(suf));
+	        	musicTimePlay.setText(String.valueOf(pre)+":"+Utils.decimalFormat.format(suf));
 			}
 		});
     }
@@ -440,40 +216,25 @@ public class EasyMusicMainActivity extends Activity{
 		}).start();
     }
     
-    public void getMusicInfos(String selection, String[] selectionArgs, String sortOrder){
-    	musicInfos = GetMusicInfoList.getMusicList(mContext, selection, selectionArgs, sortOrder);
-    	
-    	if(isGetMusicListFlag){
-	    	musicMapList.clear();
-	
-	        for(int i=0;i<musicInfos.size();++i){
-	        	Map<String, Object> map = new HashMap<String, Object>();
-	        	map.put("title", musicInfos.get(i).getTitle());
-	        	map.put("artist", musicInfos.get(i).getArtist());
-	        	map.put("album", musicInfos.get(i).getAlbum());
-	        	float duration = (float) (musicInfos.get(i).getDuration()/60.0/1000.0);
-	        	int pre = (int)duration;
-	        	float suf = (duration-pre)*60;
-	        	map.put("duration",String.valueOf(pre)+":"+decimalFormat.format(suf));
-	        	musicMapList.add(map);
-	        }
-    	}
-    }
-
-    public void getMusicInfoListAdapter(){
-    	musicInfoListAdapter = new SimpleAdapter(mContext, musicMapList, R.layout.musicinfo_item_layout,
-                new String[]{"title", "artist", "duration"},
-                new int[]{R.id.left_top, R.id.left_bottom, R.id.right});
-    }
-    
     public void MusicPlayControl(View playView){
+	  /*
+	   * if click play button do nothing before, set music info with type music, 
+	   * not care album & artist, without click album or artist' music list
+	   */
+    	if(musicInfo == null){
+    		musicInfo = new ArrayList<MusicInfo>(LocalMusicListFragment.musicInfo);
+    	}
+    	if(musicInfo == null || musicInfo.size() == 0){
+    		Toast.makeText(Utils.mContext, "There has no musics now.", Toast.LENGTH_SHORT).show();
+    		return;
+    	}
     	int id = playView.getId();
     	switch (id){
 		case R.id.music_play_next:
-			MusicPlay((positionPlay+1)%musicInfos.size());
+			MusicPlay((positionPlay+1)%musicInfo.size());
 			break;
 		case R.id.music_play_pre:
-			MusicPlay((musicInfos.size()+positionPlay-1)%musicInfos.size());
+			MusicPlay((musicInfo.size()+positionPlay-1)%musicInfo.size());
 			break;
 		case R.id.music_play_pause:
 			if(isMusicPlaying){
@@ -482,6 +243,12 @@ public class EasyMusicMainActivity extends Activity{
 				musicPlayPause.setBackgroundResource(R.drawable.music_to_pause);
 			}else{
 				if(mediaPlayer != null){
+					songPath = musicInfo.get(positionPlay).getPath();
+					File songFile = new File(songPath);
+					if(!songFile.exists()){
+						UpdateMusicInfo(positionPlay);
+						return;
+					}
 					isMusicPlaying = true;
 					mediaPlayer.start();
 					musicPlayPause.setBackgroundResource(R.drawable.music_to_start);
@@ -495,18 +262,18 @@ public class EasyMusicMainActivity extends Activity{
 		}
     }
 	
-    public void MusicPlay(int position){
+    public static void MusicPlay(final int position){
     	isMusicPlaying = false;
-    	int totalTime = musicInfos.get(position).getDuration();
-		positionPlay = position;
+    	if(musicInfo == null || musicInfo.size() == 0){
+    		Toast.makeText(Utils.mContext, "There has no musics now.", Toast.LENGTH_SHORT).show();
+    		return;
+    	}
+    	int totalTime = musicInfo.get(position).getDuration();
 		musicPlaySeekBar.setMax(totalTime);
-		songPath = musicInfos.get(position).getPath();
+		songPath = musicInfo.get(position).getPath();
 		File songFile = new File(songPath);
 		if(!songFile.exists()){
-			Toast.makeText(mContext, "The music file doesn't exists, already updated music list.", Toast.LENGTH_SHORT).show();
-			musicInfos.remove(position);
-			musicMapList.remove(position);
-			musicInfoListAdapter.notifyDataSetChanged();
+			UpdateMusicInfo(position);
 			return;
 		}
 		uri = Uri.fromFile(songFile);
@@ -514,15 +281,16 @@ public class EasyMusicMainActivity extends Activity{
 			if(mediaPlayer != null){
 				mediaPlayer.stop();
 				mediaPlayer.reset();
-			}else{
-				mediaPlayer = new MediaPlayer();
+				mediaPlayer = null;
 			}
-			mediaPlayer.setDataSource(mContext, uri);
+			mediaPlayer = new MediaPlayer();
+			mediaPlayer.setDataSource(Utils.mContext, uri);
 			mediaPlayer.setOnPreparedListener(new OnPreparedListener() {
 				
 				@Override
 				public void onPrepared(MediaPlayer mp) {
 					mediaPlayer.start();
+			    	positionPlay = position;
 					isMusicPlaying = true;
 					setMusicViewInfos();
 				}
@@ -535,9 +303,39 @@ public class EasyMusicMainActivity extends Activity{
 		}
     }
     
-    public void setMusicViewInfos(){
-    	musicPlayName.setText(musicInfos.get(positionPlay).getTitle());
-        musicTimeEnd.setText((CharSequence) musicMapList.get(positionPlay).get("duration"));
+    public static void UpdateMusicInfo(int position){
+    	Toast.makeText(Utils.mContext, "The music file doesn't exists, already updated music list.", Toast.LENGTH_SHORT).show();
+		if(mediaPlayer != null && mediaPlayer.isPlaying() && positionPlay != position){
+			isMusicPlaying = true;
+			if(positionPlay > position){
+				positionPlay -= 1;
+			}
+		}else{
+			mediaPlayer.pause();
+			mediaPlayer.stop();
+			mediaPlayer.reset();
+			mediaPlayer = null;
+			musicPlayPause.setBackgroundResource(R.drawable.music_to_pause);
+			musicPlaySeekBar.setProgress(0);
+	        musicTimePlay.setText("0:00");
+	        musicTimeEnd.setText("0:00");
+	        musicPlayName.setText("");
+			if(positionPlay == musicInfo.size()-1){
+				positionPlay = 0;
+			}
+		}
+		musicInfo.remove(position);
+		if(indexViewPager == 0){
+			LocalMusicListFragment.updateMusicInfoListAdapter(position);
+		}
+    }
+    
+    public static void setMusicViewInfos(){
+    	musicPlayName.setText(musicInfo.get(positionPlay).getTitle());
+    	float duration = (float) (musicInfo.get(positionPlay).getDuration()/60.0/1000.0);
+    	int pre = (int)duration;
+    	float suf = (duration-pre)*60;
+        musicTimeEnd.setText(String.valueOf(pre)+":"+Utils.decimalFormat.format(suf));
 		mediaPlayer.setOnCompletionListener(new OnCompletionListener(){
 			
 			@Override
@@ -556,46 +354,57 @@ public class EasyMusicMainActivity extends Activity{
 	        		}
 	        	}
 	        	Log.i("AudioInfo", String.valueOf(suf));
-	        	musicTimePlay.setText(String.valueOf(pre)+":"+decimalFormat.format(suf));
-	        	
-	        	MusicPlay((positionPlay+1)%musicInfos.size());
+	        	musicTimePlay.setText(String.valueOf(pre)+":"+Utils.decimalFormat.format(suf));
+	        	if(musicInfo == null || musicInfo.size() == 0){
+	        		Toast.makeText(Utils.mContext, "There has no musics now.", Toast.LENGTH_SHORT).show();
+	        		return;
+	        	}
+	        	MusicPlay((positionPlay+1)%musicInfo.size());
 			}
 		});
 		musicPlayPause.setBackgroundResource(R.drawable.music_to_start);
     }
     
-    public class SetElementComparator extends Collator
-	{
-    	@Override
-    	public int compare(String s1, String s2)
-    	{
-    		return s1.compareTo(s2);
-    	}
-
-    	@Override
-    	public CollationKey getCollationKey(String source)
-    	{
-    		return null;
-    	}
-
-    	@Override
-    	public int hashCode()
-    	{
-    		return 0;
-    	}
-	}
+    public class FragmentAdapter extends FragmentPagerAdapter{
+        private List<Fragment> fragmentList;
+        
+        public FragmentAdapter(FragmentManager fragmentManager, List<Fragment> fragmentListArg){
+            super(fragmentManager);
+            fragmentList = fragmentListArg;
+        }
+        
+        @Override
+        public Fragment getItem(int arg0){
+            return fragmentList.get(arg0);
+        }
+        
+        @Override
+        public int getCount(){
+            return fragmentList.size();
+        }
+    } 
     
     @Override
     protected void onDestroy(){
     	super.onDestroy();
     	
     	isMusicPlaying = false;
-    	musicMapList.clear();
-    	musicMapList = null;
-    	viewPagerContainter.clear();
-    	viewPagerContainter = null;
-    	viewTitleContainter.clear();
-    	viewTitleContainter = null;
+    	
+    	if(musicInfo != null){
+			musicInfo.clear();
+			musicInfo = null;
+		}
+    	if(viewTitleContainter != null){
+	    	viewTitleContainter.clear();
+	    	viewTitleContainter = null;
+    	}
+    	if(fragmentList != null){
+	    	fragmentList.clear();
+	    	fragmentList = null;
+    	}
+    	localMusicListFragment = null;
+    	localAlbumListFragment = null;
+    	localArtistListFragment = null;
     	
     	if(mediaPlayer != null){
     		mediaPlayer.pause();

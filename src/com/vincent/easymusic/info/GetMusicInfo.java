@@ -1,4 +1,4 @@
-package com.vincent.easymusic;
+package com.vincent.easymusic.info;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
 
-public class GetMusicInfoList {
+public class GetMusicInfo {
 	
     public static final String[] MUSIC_KEYS = new String[]{
             MediaStore.Audio.Media._ID,
@@ -36,7 +36,7 @@ public class GetMusicInfoList {
             MediaStore.Audio.Media.DATA  
     };
   
-    public static List<MusicInfo> getMusicList(Context context, String selection, String[] selectionArgs, String sortOrder) {
+    public static List<MusicInfo> getMusicInfo(Context context, String selection, String[] selectionArgs, String sortOrder) {
         List<MusicInfo> audioList = new ArrayList<MusicInfo>();
   
         ContentResolver resolver = context.getContentResolver();

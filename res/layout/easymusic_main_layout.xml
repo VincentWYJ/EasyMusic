@@ -2,16 +2,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-	android:background="@color/button_normal" >
+	android:background="@color/button_normal_color" >
 
     <LinearLayout
 	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
+	    android:layout_height="30dp"
 	    android:orientation="horizontal"
 	    android:layout_marginTop="2dp"
 	    android:layout_marginStart="2dp"
-	    android:layout_marginEnd="2dp"
-		android:layout_marginBottom="2dp" >
+	    android:layout_marginEnd="2dp" >
 	    
 	    <Button android:id="@+id/local_music_title"
 	        style="@style/MusicTypeButton"
@@ -27,10 +26,40 @@
 	    
     </LinearLayout>
     
+    <LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal"
+	    android:layout_marginTop="2dp"
+	    android:layout_marginStart="2dp"
+	    android:layout_marginEnd="2dp" >
+	    <ImageView
+	        android:id="@+id/cursor"
+	        android:layout_width="0dp"
+	        android:layout_weight="1"
+	        android:layout_height="2dp"
+	        android:scaleType="matrix"
+	        android:src="#557799" />
+	    <ImageView
+	        android:id="@+id/cursor1"
+	        android:layout_width="0dp"
+	        android:layout_weight="1"
+	        android:layout_height="2dp"
+	        android:visibility="invisible" />
+	    <ImageView
+	        android:id="@+id/cursor2"
+	        android:layout_width="0dp"
+	        android:layout_weight="1"
+	        android:layout_height="2dp"
+	        android:visibility="invisible" />
+	    
+    </LinearLayout>
+    
     <android.support.v4.view.ViewPager  android:id="@+id/musicinfo_list_fragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" >
+        android:layout_weight="1"
+		android:layout_marginTop="2dp" >
 	    
 	</android.support.v4.view.ViewPager>
     

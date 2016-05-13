@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-	<color name="button_pressed">#aabbcc</color>
-    <color name="button_normal">#ffffff</color>
+	<color name="button_press_color">#aabbcc</color>
+    <color name="button_normal_color">#ffffff</color>
+    <color name="cursor_color">#ffffff</color>
 
 </resources>
