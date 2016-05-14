@@ -23,7 +23,7 @@ public class MusicInfo {
                 mTrack;
       
     private int mDuration = 0,
-                 mSize = 0;
+                mSize = 0;
       
     private boolean isRingtone = false,
                     isPodcast = false,

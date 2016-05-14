@@ -10,18 +10,18 @@ import com.vincent.easymusic.utils.Utils;
 import com.vincent.easymusic.fragment.*;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.content.Context;
-import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.DisplayMetrics;
@@ -29,7 +29,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -44,7 +43,6 @@ public class EasyMusicMainActivity extends FragmentActivity{
 	public static MediaPlayer mediaPlayer = null;
 	
 	public static List<MusicInfo> musicInfo = null;
-	public static ArrayList<View> viewTitleContainter = null;
 	
 	public static List<Fragment> fragmentList = null;
 	public static Fragment localMusicListFragment = null;
@@ -78,11 +76,14 @@ public class EasyMusicMainActivity extends FragmentActivity{
         
         Utils.mContext = this;
         
+        Intent scanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+    	scanIntent.setData(Uri.fromFile(Environment.getExternalStorageDirectory()));
+    	Utils.mContext.sendBroadcast(scanIntent);
+        
         isMusicPlaying = false;
     	positionPlay = 0;
     	indexViewPager = 0;
         
-        viewTitleContainter = new ArrayList<View>();
         fragmentList = new ArrayList<Fragment>();
         localMusicListFragment = new LocalMusicListFragment();
         localAlbumListFragment = new LocalAlbumListFragment();
@@ -113,6 +114,12 @@ public class EasyMusicMainActivity extends FragmentActivity{
 			break;
 		}
 		viewPager.setCurrentItem(indexViewPager);
+		
+		if(indexViewPager == 1 && Utils.isInAlbumMusicList){
+			LocalAlbumListFragment.initAlbumInfoListView();
+		}else if(indexViewPager == 2 && Utils.isInArtistMusicList){
+			LocalArtistListFragment.initArtistInfoListView();
+		}
     }
     
 	public void initMusicViews(){
@@ -169,6 +176,14 @@ public class EasyMusicMainActivity extends FragmentActivity{
                 imageViewCursor.startAnimation(animation);
                 
         		indexViewPager = arg0;
+        		
+        		if(indexViewPager == 0){
+        			LocalMusicListFragment.initListView();
+        		}else if(indexViewPager == 1){
+        			LocalAlbumListFragment.initAlbumInfoListView();
+        		}else if(indexViewPager == 2){
+        			LocalArtistListFragment.initArtistInfoListView();
+        		}
         	}
         });
     }
@@ -217,13 +232,6 @@ public class EasyMusicMainActivity extends FragmentActivity{
     }
     
     public void MusicPlayControl(View playView){
-	  /*
-	   * if click play button do nothing before, set music info with type music, 
-	   * not care album & artist, without click album or artist' music list
-	   */
-    	if(musicInfo == null){
-    		musicInfo = new ArrayList<MusicInfo>(LocalMusicListFragment.musicInfo);
-    	}
     	if(musicInfo == null || musicInfo.size() == 0){
     		Toast.makeText(Utils.mContext, "There has no musics now.", Toast.LENGTH_SHORT).show();
     		return;
@@ -304,6 +312,10 @@ public class EasyMusicMainActivity extends FragmentActivity{
     }
     
     public static void UpdateMusicInfo(int position){
+    	Intent scanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+    	scanIntent.setData(Uri.fromFile(Environment.getExternalStorageDirectory()));
+    	Utils.mContext.sendBroadcast(scanIntent);
+    
     	Toast.makeText(Utils.mContext, "The music file doesn't exists, already updated music list.", Toast.LENGTH_SHORT).show();
 		if(mediaPlayer != null && mediaPlayer.isPlaying() && positionPlay != position){
 			isMusicPlaying = true;
@@ -311,10 +323,12 @@ public class EasyMusicMainActivity extends FragmentActivity{
 				positionPlay -= 1;
 			}
 		}else{
-			mediaPlayer.pause();
-			mediaPlayer.stop();
-			mediaPlayer.reset();
-			mediaPlayer = null;
+			if(mediaPlayer != null){
+				mediaPlayer.pause();
+				mediaPlayer.stop();
+				mediaPlayer.reset();
+				mediaPlayer = null;
+			}
 			musicPlayPause.setBackgroundResource(R.drawable.music_to_pause);
 			musicPlaySeekBar.setProgress(0);
 	        musicTimePlay.setText("0:00");
@@ -324,9 +338,12 @@ public class EasyMusicMainActivity extends FragmentActivity{
 				positionPlay = 0;
 			}
 		}
-		musicInfo.remove(position);
 		if(indexViewPager == 0){
 			LocalMusicListFragment.updateMusicInfoListAdapter(position);
+		}else if(indexViewPager == 1 && Utils.isInAlbumMusicList){
+			LocalAlbumListFragment.updateAlbumInfoListAdapter(position);
+		}else if(indexViewPager == 2 && Utils.isInArtistMusicList){
+			LocalArtistListFragment.updateArtistInfoListAdapter(position);
 		}
     }
     
@@ -383,7 +400,7 @@ public class EasyMusicMainActivity extends FragmentActivity{
             return fragmentList.size();
         }
     } 
-    
+	
     @Override
     protected void onDestroy(){
     	super.onDestroy();
@@ -394,10 +411,6 @@ public class EasyMusicMainActivity extends FragmentActivity{
 			musicInfo.clear();
 			musicInfo = null;
 		}
-    	if(viewTitleContainter != null){
-	    	viewTitleContainter.clear();
-	    	viewTitleContainter = null;
-    	}
     	if(fragmentList != null){
 	    	fragmentList.clear();
 	    	fragmentList = null;

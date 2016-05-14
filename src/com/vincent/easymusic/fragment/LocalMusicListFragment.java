@@ -12,11 +12,13 @@
 package com.vincent.easymusic.fragment;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.vincent.easymusic.EasyMusicMainActivity;
 import com.vincent.easymusic.R;
+import com.vincent.easymusic.info.GetMusicInfo;
 import com.vincent.easymusic.info.MusicInfo;
 import com.vincent.easymusic.utils.Utils;
 
@@ -33,20 +35,14 @@ import android.widget.AdapterView.OnItemClickListener;
 public class LocalMusicListFragment extends Fragment {
 	
 	private View rootView = null;
-	private ListView musicInfoListView = null;
+	private static ListView musicInfoListView = null;
 	
-	public static List<MusicInfo> musicInfo = null;
+	private static List<MusicInfo> musicInfo = null;
 	private static List<Map<String, Object>> musicInfoList = null;
 	private static SimpleAdapter musicInfoListAdapter = null;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
-        musicInfo = Utils.getMusicInfo(null, null, Utils.musicSortOrder);
-        
-        musicInfoList = Utils.getMusicInfoList(musicInfo);
-
-        musicInfoListAdapter = Utils.getMusicInfoListAdapter(musicInfoList);
     }
 
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
@@ -64,17 +60,21 @@ public class LocalMusicListFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
     }
     
-    public void initListView(){
+    public static void initListView(){
+    	musicInfo = GetMusicInfo.getMusicInfo(Utils.mContext, null, null, Utils.musicSortOrder);
+      	if(EasyMusicMainActivity.musicInfo == null){
+      		EasyMusicMainActivity.musicInfo = new ArrayList<MusicInfo>(musicInfo);
+      	}
+        getMusicInfoList();
+        getMusicInfoListAdapter();
         musicInfoListView.setAdapter(musicInfoListAdapter);
         musicInfoListView.setOnItemClickListener(new OnItemClickListener() {
         	
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				if(EasyMusicMainActivity.musicInfo != null){
-					if(EasyMusicMainActivity.musicInfo != null){
-						EasyMusicMainActivity.musicInfo.clear();
-						EasyMusicMainActivity.musicInfo = null;
-					}
+					EasyMusicMainActivity.musicInfo.clear();
+					EasyMusicMainActivity.musicInfo = null;
 				}
 				EasyMusicMainActivity.musicInfo = new ArrayList<MusicInfo>(musicInfo);
 				EasyMusicMainActivity.MusicPlay(position);
@@ -82,10 +82,37 @@ public class LocalMusicListFragment extends Fragment {
 		});
     }
     
+    public static void getMusicInfoList(){
+    	if(musicInfoList == null){
+    		musicInfoList = new ArrayList<Map<String, Object>>();
+    	}
+    	musicInfoList.clear();
+        for(int i=0; i<musicInfo.size(); ++i){
+        	Map<String, Object> map = new HashMap<String, Object>();
+        	map.put("title", musicInfo.get(i).getTitle());
+        	map.put("artist", musicInfo.get(i).getArtist());
+        	float duration = (float) (musicInfo.get(i).getDuration()/60.0/1000.0);
+        	int pre = (int)duration;
+        	float suf = (duration-pre)*60;
+        	map.put("duration",String.valueOf(pre)+":"+Utils.decimalFormat.format(suf));
+        	musicInfoList.add(map);
+        }
+	}
+
+    public static void getMusicInfoListAdapter(){
+    	musicInfoListAdapter = new SimpleAdapter(Utils.mContext, musicInfoList, R.layout.musicinfo_item_layout,
+                new String[]{"title", "artist", "duration"},
+                new int[]{R.id.left_top, R.id.left_bottom, R.id.right});
+    }
+    
     public static void updateMusicInfoListAdapter(int position){
     	musicInfo.remove(position);
     	musicInfoList.remove(position);
+    	if(musicInfoListAdapter == null){
+    		getMusicInfoListAdapter();
+    	}
 		musicInfoListAdapter.notifyDataSetChanged();
+		EasyMusicMainActivity.musicInfo = new ArrayList<MusicInfo>(musicInfo);
     }
     
     @Override

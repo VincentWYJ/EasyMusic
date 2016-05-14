@@ -23,5 +23,10 @@ A easy music playing tool
 2. add monitor for music file modify
 3. change 3 page return from list to fragment
 4. split model, view, control to cast MVC
-5. hide action click action of album, artist list item 
+5. hide click action of album, artist list item 
+ 
+ 2016.05.14
+ 1. resume click action of album, artist list item, like as music
+ 2. initial first grade list view again after page was changed
+ 3. click album or artist title button will go back to first grade list if current list is album-music or artist-music
  
