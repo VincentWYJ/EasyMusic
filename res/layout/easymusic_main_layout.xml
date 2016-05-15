@@ -2,7 +2,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-	android:background="@color/button_normal_color" >
+	android:background="@color/global_bg_color"
+	android:fitsSystemWindows="true" >
 
     <LinearLayout
 	    android:layout_width="match_parent"
@@ -35,32 +36,24 @@
 	    android:layout_marginEnd="2dp" >
 	    <ImageView
 	        android:id="@+id/cursor"
-	        android:layout_width="0dp"
-	        android:layout_weight="1"
-	        android:layout_height="2dp"
-	        android:scaleType="matrix"
-	        android:src="#557799" />
+			style="@style/CursorStyle" />
 	    <ImageView
 	        android:id="@+id/cursor1"
-	        android:layout_width="0dp"
-	        android:layout_weight="1"
-	        android:layout_height="2dp"
+	        style="@style/CursorStyle"
 	        android:visibility="invisible" />
 	    <ImageView
 	        android:id="@+id/cursor2"
-	        android:layout_width="0dp"
-	        android:layout_weight="1"
-	        android:layout_height="2dp"
+	        style="@style/CursorStyle"
 	        android:visibility="invisible" />
 	    
     </LinearLayout>
     
-    <android.support.v4.view.ViewPager  android:id="@+id/musicinfo_list_fragment"
+    <android.support.v4.view.ViewPager  android:id="@+id/musicinfo_list_viewpager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-		android:layout_marginTop="2dp" >
-	    
+		android:layout_marginTop="5dp"
+		android:layout_marginBottom="5dp" >
 	</android.support.v4.view.ViewPager>
     
     <LinearLayout android:id="@+id/music_playparams_layout"
@@ -68,8 +61,8 @@
         android:layout_height="0dip"
         android:layout_weight="0.2"
         android:orientation="vertical"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp" >
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp" >
             
         <SeekBar android:id="@+id/music_play_seekbar"
             style="@style/SeekBar" />"
@@ -88,7 +81,8 @@
 		        android:layout_height="wrap_content"
 		        android:layout_weight="1"
 		        android:gravity="center"
-		        android:textSize="@dimen/music_info_leftbottom_size" />
+		        android:textSize="@dimen/music_info_leftbottom_size"
+		        android:textColor="@color/text_color" />
 	        
 	        <TextView android:id="@+id/music_time_end"
 		        style="@style/InfoBottomTextView" />"

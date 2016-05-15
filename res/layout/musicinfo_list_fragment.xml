@@ -2,11 +2,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/button_press_color" >
+    android:background="@color/list_bg_color" >
     
     <ListView android:id="@+id/music_info_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:dividerHeight="1dp" />
+        android:dividerHeight="1dp"
+        android:listSelector="@drawable/list_item_bg_color" />
 
 </LinearLayout>

@@ -1,28 +1,25 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!--
-        Base application theme, dependent on API level. This theme is replaced
-        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
-    -->
-    <style name="AppBaseTheme" parent="android:Theme.Light">
-        <!--
-            Theme customizations available in newer API levels can go in
-            res/values-vXX/styles.xml, while customizations related to
-            backward-compatibility can go here.
-        -->
+    <style name="AppTheme" parent="@android:style/Theme.Holo.Light.NoActionBar">
+        <item name="android:actionBarStyle">@style/ActionBarStyle</item>
     </style>
-
-    <!-- Application theme. -->
-    <style name="AppTheme" parent="AppBaseTheme">
-        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
-    </style>
+	
+    <style name="ActionBarStyle" parent="@android:style/Widget.Holo.ActionBar">  
+     	<item name="android:titleTextStyle">@style/ActionBarTextColor</item>
+     	<item name="android:background">@color/actionbar_color</item>
+	</style>
     
+    <style name="ActionBarTextColor" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
+    	<item name="android:textColor">@color/text_color</item>
+	</style>
+
     <style name="MusicTypeButton">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_weight">1</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:gravity">center</item>
         <item name="android:textSize">@dimen/music_type_button_size</item>
+        <item name="android:textColor">@color/text_color</item>
         <item name="android:onClick">LocalTypeSelection</item>
 		<item name="android:background">@drawable/localmusic_button_bg</item>
     </style>
@@ -30,7 +27,9 @@
     <style name="PlayControlButton">
         <item name="android:layout_width">40dp</item>
         <item name="android:layout_height">40dp</item>
+        <item name="android:textColor">@color/text_color</item>
         <item name="android:onClick">MusicPlayControl</item>
+        <item name="android:contentDescription">@null</item>
     </style>
     
     <style name="SeekBar">
@@ -38,19 +37,31 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:thumb">@drawable/indicator1</item>
         <item name="android:thumbOffset">0dp</item>
-        <item name="android:maxHeight">2.5dp</item>
+        <item name="android:progressDrawable">@color/progress_color</item>
+        <item name="android:maxHeight">3dp</item>
     </style>
     
      <style name="InfoTopTextView">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/text_color</item>
         <item name="android:textSize">@dimen/music_info_lefttop_size</item>
     </style>
     
     <style name="InfoBottomTextView">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/text_color</item>
         <item name="android:textSize">@dimen/music_info_leftbottom_size</item>
+    </style>
+    
+    <style name="CursorStyle">
+		<item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_height">3dp</item>
+        <item name="android:scaleType">matrix</item>
+        <item name="android:src">@color/cursor_color</item>
+        <item name="android:contentDescription">@null</item>
     </style>
 
 </resources>

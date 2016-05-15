@@ -29,4 +29,7 @@ A easy music playing tool
  1. resume click action of album, artist list item, like as music
  2. initial first grade list view again after page was changed
  3. click album or artist title button will go back to first grade list if current list is album-music or artist-music
- 
+
+2016.05.15
+1. set color for global bg, statusbar bg, actionbar bg,  list bg, list item press & normal bg
+2. remove actionbar  temporarily

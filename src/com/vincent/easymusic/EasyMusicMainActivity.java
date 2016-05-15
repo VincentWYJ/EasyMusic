@@ -72,6 +72,8 @@ public class EasyMusicMainActivity extends FragmentActivity{
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         
+        Utils.initStatusBarColor(this); 
+        
         setContentView(R.layout.easymusic_main_layout);
         
         Utils.mContext = this;
@@ -96,7 +98,7 @@ public class EasyMusicMainActivity extends FragmentActivity{
         setSeekBarOnClickListener();
 		setSeekBarMoveListener();
     }
-    
+
     //action for title button click
     public void LocalTypeSelection(View localView){
     	int viewId = localView.getId();
@@ -123,7 +125,7 @@ public class EasyMusicMainActivity extends FragmentActivity{
     }
     
 	public void initMusicViews(){
-    	viewPager = (ViewPager) findViewById(R.id.musicinfo_list_fragment);
+    	viewPager = (ViewPager) findViewById(R.id.musicinfo_list_viewpager);
         
         musicPlaySeekBar = (SeekBar)findViewById(R.id.music_play_seekbar);
         musicTimePlay = (TextView)findViewById(R.id.music_time_play);
