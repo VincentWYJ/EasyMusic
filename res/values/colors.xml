@@ -6,7 +6,7 @@
 	<color name="list_item_bg_press_color">#ffaa77</color>
 	<color name="list_item_bg_normal_color">#efcc99</color>
 	
-	<color name="statusbar_color">#ffcc99</color>
+	<color name="statusbar_color">#ffaa77</color>
 	<color name="actionbar_color">#ffcc99</color>
 	
     <color name="list_bg_color">#efcc99</color>

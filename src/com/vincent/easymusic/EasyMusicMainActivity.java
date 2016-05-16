@@ -117,9 +117,11 @@ public class EasyMusicMainActivity extends FragmentActivity{
 		}
 		viewPager.setCurrentItem(indexViewPager);
 		
-		if(indexViewPager == 1 && Utils.isInAlbumMusicList){
+		if(indexViewPager == 0){
+			LocalMusicListFragment.initListView();
+		}else if(indexViewPager == 1){
 			LocalAlbumListFragment.initAlbumInfoListView();
-		}else if(indexViewPager == 2 && Utils.isInArtistMusicList){
+		}else if(indexViewPager == 2){
 			LocalArtistListFragment.initArtistInfoListView();
 		}
     }
@@ -289,7 +291,10 @@ public class EasyMusicMainActivity extends FragmentActivity{
 		uri = Uri.fromFile(songFile);
 		try{
 			if(mediaPlayer != null){
-				mediaPlayer.stop();
+				if(mediaPlayer.isPlaying()){
+					mediaPlayer.pause();
+					mediaPlayer.stop();
+				}
 				mediaPlayer.reset();
 				mediaPlayer = null;
 			}
@@ -300,8 +305,8 @@ public class EasyMusicMainActivity extends FragmentActivity{
 				@Override
 				public void onPrepared(MediaPlayer mp) {
 					mediaPlayer.start();
-			    	positionPlay = position;
 					isMusicPlaying = true;
+					positionPlay = position;
 					setMusicViewInfos();
 				}
 			});
@@ -326,8 +331,10 @@ public class EasyMusicMainActivity extends FragmentActivity{
 			}
 		}else{
 			if(mediaPlayer != null){
-				mediaPlayer.pause();
-				mediaPlayer.stop();
+				if(mediaPlayer.isPlaying()){
+					mediaPlayer.pause();
+					mediaPlayer.stop();
+				}
 				mediaPlayer.reset();
 				mediaPlayer = null;
 			}
@@ -340,11 +347,11 @@ public class EasyMusicMainActivity extends FragmentActivity{
 				positionPlay = 0;
 			}
 		}
-		if(indexViewPager == 0){
+		if(Utils.isPlayingInMusicList){
 			LocalMusicListFragment.updateMusicInfoListAdapter(position);
-		}else if(indexViewPager == 1 && Utils.isInAlbumMusicList){
+		}else if(Utils.isPlayingInAlbumMusicList){
 			LocalAlbumListFragment.updateAlbumInfoListAdapter(position);
-		}else if(indexViewPager == 2 && Utils.isInArtistMusicList){
+		}else if(Utils.isPlayingInArtistMusicList){
 			LocalArtistListFragment.updateArtistInfoListAdapter(position);
 		}
     }
@@ -422,8 +429,10 @@ public class EasyMusicMainActivity extends FragmentActivity{
     	localArtistListFragment = null;
     	
     	if(mediaPlayer != null){
-    		mediaPlayer.pause();
-			mediaPlayer.stop();
+    		if(mediaPlayer.isPlaying()){
+	    		mediaPlayer.pause();
+				mediaPlayer.stop();
+    		}
 			mediaPlayer.release();
 			mediaPlayer = null;
 		}

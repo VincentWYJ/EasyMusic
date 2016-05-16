@@ -95,6 +95,10 @@ public class LocalAlbumListFragment extends Fragment {
 						}
 						EasyMusicMainActivity.musicInfo = new ArrayList<MusicInfo>(musicInfo);
 						EasyMusicMainActivity.MusicPlay(position);
+						
+						Utils.isPlayingInMusicList = false;
+						Utils.isPlayingInAlbumMusicList = true;
+						Utils.isPlayingInArtistMusicList = false;
 					}
 				});
 				
@@ -163,13 +167,19 @@ public class LocalAlbumListFragment extends Fragment {
     }
     
     public static void updateAlbumInfoListAdapter(int position){
-    	musicInfo.remove(position);
-    	albumInfoList.remove(position);
-    	if(albumInfoListAdapter == null){
-    		getAlbumMusicInfoListAdapter();
-    	}
-    	albumInfoListAdapter.notifyDataSetChanged();
+    	String removeAlbumName = musicInfo.get(position).getAlbum();
+    	musicInfo = GetMusicInfo.getMusicInfo(Utils.mContext, MediaStore.Audio.Media.ALBUM+"=?", new String[]{removeAlbumName}, Utils.musicSortOrder);
+    	if(EasyMusicMainActivity.musicInfo != null){
+			EasyMusicMainActivity.musicInfo.clear();
+			EasyMusicMainActivity.musicInfo = null;
+		}
 		EasyMusicMainActivity.musicInfo = new ArrayList<MusicInfo>(musicInfo);
+    	if(Utils.isInAlbumMusicList && removeAlbumName.equals(albumName)){
+        	getAlbumMusicInfoList();
+        	albumInfoListAdapter.notifyDataSetChanged();
+    	}else{
+    		initAlbumInfoListView();
+    	}
     }
     
     @Override

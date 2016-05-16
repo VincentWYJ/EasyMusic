@@ -78,6 +78,10 @@ public class LocalMusicListFragment extends Fragment {
 				}
 				EasyMusicMainActivity.musicInfo = new ArrayList<MusicInfo>(musicInfo);
 				EasyMusicMainActivity.MusicPlay(position);
+				
+				Utils.isPlayingInMusicList = true;
+				Utils.isPlayingInAlbumMusicList = false;
+				Utils.isPlayingInArtistMusicList = false;
 			}
 		});
     }
@@ -106,12 +110,13 @@ public class LocalMusicListFragment extends Fragment {
     }
     
     public static void updateMusicInfoListAdapter(int position){
-    	musicInfo.remove(position);
-    	musicInfoList.remove(position);
-    	if(musicInfoListAdapter == null){
-    		getMusicInfoListAdapter();
-    	}
+    	musicInfo = GetMusicInfo.getMusicInfo(Utils.mContext, null, null, Utils.musicSortOrder);
+        getMusicInfoList();
 		musicInfoListAdapter.notifyDataSetChanged();
+		if(EasyMusicMainActivity.musicInfo != null){
+			EasyMusicMainActivity.musicInfo.clear();
+			EasyMusicMainActivity.musicInfo = null;
+		}
 		EasyMusicMainActivity.musicInfo = new ArrayList<MusicInfo>(musicInfo);
     }
     

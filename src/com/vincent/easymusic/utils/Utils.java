@@ -6,6 +6,8 @@ import java.text.DecimalFormat;
 import java.util.Locale;
 
 import com.vincent.easymusic.R;
+import com.vincent.easymusic.fragment.LocalAlbumListFragment;
+import com.vincent.easymusic.fragment.LocalMusicListFragment;
 
 import android.app.Activity;
 import android.content.Context;
@@ -28,6 +30,9 @@ public class Utils{
 	
 	public static boolean isInAlbumMusicList = false;
 	public static boolean isInArtistMusicList = false;
+	public static boolean isPlayingInMusicList = true;
+	public static boolean isPlayingInAlbumMusicList = false;
+	public static boolean isPlayingInArtistMusicList = false;
 	
 	public static void initStatusBarColor(Activity activity){
         if (android.os.Build.VERSION.SDK_INT > 18) {
