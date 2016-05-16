@@ -34,6 +34,10 @@ public class Utils{
 	public static boolean isPlayingInAlbumMusicList = false;
 	public static boolean isPlayingInArtistMusicList = false;
 	
+	public static String ACTION_CONTROL_PLAY_PAUSE = "com.vincent.easymusic.ACTION_CONTROL_PLAY_PAUSE";
+	public static String ACTION_CONTROL_PLAY_NEXT = "com.vincent.easymusic.ACTION_CONTROL_PLAY_NEXT";
+	public static String ACTION_CONTROL_PLAY_PRE = "com.vincent.easymusic.ACTION_CONTROL_PLAY_PRE";
+	
 	public static void initStatusBarColor(Activity activity){
         if (android.os.Build.VERSION.SDK_INT > 18) {
 			Window window = activity.getWindow();

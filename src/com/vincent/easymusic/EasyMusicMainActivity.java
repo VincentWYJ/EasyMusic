@@ -10,11 +10,16 @@ import com.vincent.easymusic.utils.Utils;
 import com.vincent.easymusic.fragment.*;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.NotificationCompat;
 import android.graphics.Matrix;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -24,12 +29,14 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
+import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
@@ -64,9 +71,14 @@ public class EasyMusicMainActivity extends FragmentActivity{
 	private static TextView musicPlayName = null;
 	private static TextView musicTimePlay = null;
 	private static TextView musicTimeEnd = null;
-	private static ImageView musicPlayPause = null;
+	public static ImageView musicPlayPause = null;
 	private static ViewPager viewPager = null;
-	private static FragmentAdapter fragmentAdapter = null;  
+	private static FragmentAdapter fragmentAdapter = null;
+	
+	public static RemoteViews mRemoteView = null;
+	private static NotificationManager mNotificationManager = null;
+	private static Notification mNotification = null;
+	private static int mNotificationId = 0;
 	
 	@Override
     protected void onCreate(Bundle savedInstanceState){
@@ -156,6 +168,10 @@ public class EasyMusicMainActivity extends FragmentActivity{
         musicPlaySeekBar.setProgress(0);
         musicTimePlay.setText("0:00");
         musicTimeEnd.setText("0:00");
+        
+    	mNotificationManager = (NotificationManager)Utils.mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+    	mNotificationId = (int) System.currentTimeMillis();
+    	mNotification = createNotification();
     }
     
     @SuppressWarnings("deprecation")
@@ -253,6 +269,7 @@ public class EasyMusicMainActivity extends FragmentActivity{
 				isMusicPlaying = false;
 				mediaPlayer.pause();
 				musicPlayPause.setBackgroundResource(R.drawable.music_to_pause);
+				updateNotification(musicInfo.get(positionPlay).getTitle(), musicInfo.get(positionPlay).getArtist(), true, true);
 			}else{
 				if(mediaPlayer != null){
 					songPath = musicInfo.get(positionPlay).getPath();
@@ -264,6 +281,7 @@ public class EasyMusicMainActivity extends FragmentActivity{
 					isMusicPlaying = true;
 					mediaPlayer.start();
 					musicPlayPause.setBackgroundResource(R.drawable.music_to_start);
+					updateNotification(musicInfo.get(positionPlay).getTitle(), musicInfo.get(positionPlay).getArtist(), false, true);
 				}else{
 					MusicPlay(positionPlay);
 				}
@@ -308,6 +326,7 @@ public class EasyMusicMainActivity extends FragmentActivity{
 					isMusicPlaying = true;
 					positionPlay = position;
 					setMusicViewInfos();
+					updateNotification(musicInfo.get(positionPlay).getTitle(), musicInfo.get(positionPlay).getArtist(), false, true);
 				}
 			});
 			mediaPlayer.prepareAsync();
@@ -410,6 +429,49 @@ public class EasyMusicMainActivity extends FragmentActivity{
         }
     } 
 	
+    public Notification createNotification(){
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(Utils.mContext);
+
+		Intent main = new Intent(Utils.mContext, EasyMusicMainActivity.class);
+		PendingIntent mainPi = PendingIntent.getActivity(Utils.mContext, 0, main, 0);
+		
+		Intent play = new Intent(Utils.ACTION_CONTROL_PLAY_PAUSE);
+		PendingIntent playPi = PendingIntent.getBroadcast(Utils.mContext, 0, play, 0);
+		
+		Intent next = new Intent(Utils.ACTION_CONTROL_PLAY_NEXT);
+		PendingIntent nextPi = PendingIntent.getBroadcast(Utils.mContext, 0, next, 0);
+		
+		Intent pre = new Intent(Utils.ACTION_CONTROL_PLAY_PRE);
+		PendingIntent prePi = PendingIntent.getBroadcast(Utils.mContext, 0, pre, 0);
+		
+		mRemoteView = new RemoteViews(Utils.mContext.getPackageName(), R.layout.notify_show_playmusic);
+		mRemoteView.setOnClickPendingIntent(R.id.img_notifyIcon, mainPi);
+		mRemoteView.setOnClickPendingIntent(R.id.img_notifyPlayOrPause, playPi);
+		mRemoteView.setOnClickPendingIntent(R.id.img_notifyNext, nextPi);
+		mRemoteView.setOnClickPendingIntent(R.id.img_notifyPre, prePi);
+		
+		builder.setContent(mRemoteView).setSmallIcon(R.drawable.launcher_icon)
+				.setContentTitle("Title").setContentText("Artist")
+				.setContentIntent(mainPi);
+		
+		return builder.build();
+	}
+    
+	public static void updateNotification(String title, String artist, boolean isPlaying, boolean hasNext){
+		if(!TextUtils.isEmpty(title)){
+			mRemoteView.setTextViewText(R.id.txt_notifyMusicName, title);
+		}
+		if(!TextUtils.isEmpty(artist)){
+			mRemoteView.setTextViewText(R.id.txt_notifyNickName, artist);
+		}
+		if(isPlaying){
+			mRemoteView.setImageViewResource(R.id.img_notifyPlayOrPause, R.drawable.ic_pause);
+		}else{
+			mRemoteView.setImageViewResource(R.id.img_notifyPlayOrPause, R.drawable.ic_play);
+		}
+		mNotificationManager.notify(mNotificationId, mNotification);
+	}
+    
     @Override
     protected void onDestroy(){
     	super.onDestroy();

@@ -37,3 +37,4 @@ A easy music playing tool
 2016.05.16
 1. fix bug--play last music in music list->go to 2 or 3 page->remove the playing music file->go back to 1 page->pause/play the music->crash--out index of music list
 2. update album or artist after remove music file when current page is 2 or 3
+3. add music play notification, pause/play, next, previous

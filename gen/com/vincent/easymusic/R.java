@@ -56,12 +56,16 @@ public final class R {
         public static final int cursor=0x7f0a0003;
         public static final int cursor1=0x7f0a0004;
         public static final int cursor2=0x7f0a0005;
+        public static final int img_notifyIcon=0x7f0a0013;
+        public static final int img_notifyNext=0x7f0a0014;
+        public static final int img_notifyPlayOrPause=0x7f0a0015;
+        public static final int img_notifyPre=0x7f0a0016;
         public static final int left_bottom=0x7f0a0010;
         public static final int left_top=0x7f0a000f;
         public static final int local_album_title=0x7f0a0001;
         public static final int local_artist_title=0x7f0a0002;
         public static final int local_music_title=0x7f0a0000;
-        public static final int menu_item_share=0x7f0a0013;
+        public static final int menu_item_share=0x7f0a0019;
         public static final int music_info_list=0x7f0a0012;
         public static final int music_play_name=0x7f0a000a;
         public static final int music_play_next=0x7f0a000e;
@@ -73,6 +77,8 @@ public final class R {
         public static final int music_time_play=0x7f0a0009;
         public static final int musicinfo_list_viewpager=0x7f0a0006;
         public static final int right=0x7f0a0011;
+        public static final int txt_notifyMusicName=0x7f0a0017;
+        public static final int txt_notifyNickName=0x7f0a0018;
     }
     public static final class integer {
         public static final int anim_full_time=0x7f060000;
@@ -82,6 +88,7 @@ public final class R {
         public static final int easymusic_main_layout=0x7f030000;
         public static final int musicinfo_item_layout=0x7f030001;
         public static final int musicinfo_list_fragment=0x7f030002;
+        public static final int notify_show_playmusic=0x7f030003;
     }
     public static final class menu {
         public static final int main=0x7f090000;
