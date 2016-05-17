@@ -49,7 +49,7 @@ public class Utils{
 			tintManager.setStatusBarTintResource(R.color.statusbar_color);
 		}
 	}
-    	
+
     public class SetElementComparator extends Collator{
     	
     	@Override

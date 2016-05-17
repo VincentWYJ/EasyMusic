@@ -11,6 +11,7 @@
 
 package com.vincent.easymusic.fragment;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +24,11 @@ import com.vincent.easymusic.info.MusicInfo;
 import com.vincent.easymusic.utils.Utils;
 
 import android.support.v4.app.Fragment;
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +36,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 
 public class LocalMusicListFragment extends Fragment {
 	
@@ -82,6 +88,39 @@ public class LocalMusicListFragment extends Fragment {
 				Utils.isPlayingInMusicList = true;
 				Utils.isPlayingInAlbumMusicList = false;
 				Utils.isPlayingInArtistMusicList = false;
+			}
+		});
+        musicInfoListView.setOnItemLongClickListener(new OnItemLongClickListener() {
+
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+				File file = new File(musicInfo.get(position).getPath());
+				if(file.exists()){
+					file.delete();
+					Intent scanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+			    	scanIntent.setData(Uri.fromFile(file));
+			    	Utils.mContext.sendBroadcast(scanIntent);
+				}
+				((Activity) Utils.mContext).runOnUiThread(new Runnable(){
+					
+					@Override
+					public void run(){
+		            	try{
+							Thread.sleep(1000);
+							if(Utils.isPlayingInMusicList){
+								EasyMusicMainActivity.UpdateMusicInfo(position);
+							}else{
+								musicInfo = GetMusicInfo.getMusicInfo(Utils.mContext, null, null, Utils.musicSortOrder);
+						        getMusicInfoList();
+								musicInfoListAdapter.notifyDataSetChanged();
+							}
+						} catch (InterruptedException e){
+							e.printStackTrace();
+						}
+					}
+				});
+				
+				return true;
 			}
 		});
     }

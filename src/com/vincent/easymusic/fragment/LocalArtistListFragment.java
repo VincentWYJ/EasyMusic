@@ -101,7 +101,6 @@ public class LocalArtistListFragment extends Fragment {
 						Utils.isPlayingInArtistMusicList = true;
 					}
 				});
-				
 			}
 		});
     }

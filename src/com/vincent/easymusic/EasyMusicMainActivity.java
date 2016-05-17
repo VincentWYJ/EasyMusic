@@ -90,10 +90,6 @@ public class EasyMusicMainActivity extends FragmentActivity{
         
         Utils.mContext = this;
         
-        Intent scanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-    	scanIntent.setData(Uri.fromFile(Environment.getExternalStorageDirectory()));
-    	Utils.mContext.sendBroadcast(scanIntent);
-        
         isMusicPlaying = false;
     	positionPlay = 0;
     	indexViewPager = 0;
@@ -269,6 +265,13 @@ public class EasyMusicMainActivity extends FragmentActivity{
 				isMusicPlaying = false;
 				mediaPlayer.pause();
 				musicPlayPause.setBackgroundResource(R.drawable.music_to_pause);
+				songPath = musicInfo.get(positionPlay).getPath();
+				File songFile = new File(songPath);
+				if(!songFile.exists()){
+					UpdateMusicInfo(positionPlay);
+					updateNotification("Title", "Artist", true, true);
+					return;
+				}
 				updateNotification(musicInfo.get(positionPlay).getTitle(), musicInfo.get(positionPlay).getArtist(), true, true);
 			}else{
 				if(mediaPlayer != null){
@@ -351,6 +354,7 @@ public class EasyMusicMainActivity extends FragmentActivity{
 		}else{
 			if(mediaPlayer != null){
 				if(mediaPlayer.isPlaying()){
+					isMusicPlaying = false;
 					mediaPlayer.pause();
 					mediaPlayer.stop();
 				}
@@ -358,6 +362,7 @@ public class EasyMusicMainActivity extends FragmentActivity{
 				mediaPlayer = null;
 			}
 			musicPlayPause.setBackgroundResource(R.drawable.music_to_pause);
+			updateNotification("Title", "Artist", true, true);
 			musicPlaySeekBar.setProgress(0);
 	        musicTimePlay.setText("0:00");
 	        musicTimeEnd.setText("0:00");
