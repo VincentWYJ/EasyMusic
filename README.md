@@ -41,3 +41,4 @@ A easy music playing tool
 
 2016.05.17
 1. add long click action for list music item to remove the music file, not support album or artist
+2. seal music info judge and pause/play sentence to isMusicInfoEmpty() and actionPauseOrPlay()

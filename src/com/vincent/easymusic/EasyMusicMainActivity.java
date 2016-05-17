@@ -248,96 +248,96 @@ public class EasyMusicMainActivity extends FragmentActivity{
     }
     
     public void MusicPlayControl(View playView){
-    	if(musicInfo == null || musicInfo.size() == 0){
-    		Toast.makeText(Utils.mContext, "There has no musics now.", Toast.LENGTH_SHORT).show();
-    		return;
+    	if(!Utils.isMusicInfoEmpty()){
+	    	int id = playView.getId();
+	    	switch (id){
+			case R.id.music_play_next:
+				MusicPlay((positionPlay+1)%musicInfo.size());
+				break;
+			case R.id.music_play_pre:
+				MusicPlay((musicInfo.size()+positionPlay-1)%musicInfo.size());
+				break;
+			case R.id.music_play_pause:
+				actionPauseOrPlay();
+				break;
+			default:
+				break;
+			}
     	}
-    	int id = playView.getId();
-    	switch (id){
-		case R.id.music_play_next:
-			MusicPlay((positionPlay+1)%musicInfo.size());
-			break;
-		case R.id.music_play_pre:
-			MusicPlay((musicInfo.size()+positionPlay-1)%musicInfo.size());
-			break;
-		case R.id.music_play_pause:
-			if(isMusicPlaying){
-				isMusicPlaying = false;
-				mediaPlayer.pause();
-				musicPlayPause.setBackgroundResource(R.drawable.music_to_pause);
+    }
+	
+    public static void actionPauseOrPlay(){
+    	if(isMusicPlaying){
+			isMusicPlaying = false;
+			mediaPlayer.pause();
+			musicPlayPause.setBackgroundResource(R.drawable.music_to_pause);
+			songPath = musicInfo.get(positionPlay).getPath();
+			File songFile = new File(songPath);
+			if(!songFile.exists()){
+				UpdateMusicInfo(positionPlay);
+				updateNotification("Title", "Artist", true, true);
+				return;
+			}
+			updateNotification(musicInfo.get(positionPlay).getTitle(), musicInfo.get(positionPlay).getArtist(), true, true);
+		}else{
+			if(mediaPlayer != null){
 				songPath = musicInfo.get(positionPlay).getPath();
 				File songFile = new File(songPath);
 				if(!songFile.exists()){
 					UpdateMusicInfo(positionPlay);
-					updateNotification("Title", "Artist", true, true);
 					return;
 				}
-				updateNotification(musicInfo.get(positionPlay).getTitle(), musicInfo.get(positionPlay).getArtist(), true, true);
+				isMusicPlaying = true;
+				mediaPlayer.start();
+				musicPlayPause.setBackgroundResource(R.drawable.music_to_start);
+				updateNotification(musicInfo.get(positionPlay).getTitle(), musicInfo.get(positionPlay).getArtist(), false, true);
 			}else{
-				if(mediaPlayer != null){
-					songPath = musicInfo.get(positionPlay).getPath();
-					File songFile = new File(songPath);
-					if(!songFile.exists()){
-						UpdateMusicInfo(positionPlay);
-						return;
-					}
-					isMusicPlaying = true;
-					mediaPlayer.start();
-					musicPlayPause.setBackgroundResource(R.drawable.music_to_start);
-					updateNotification(musicInfo.get(positionPlay).getTitle(), musicInfo.get(positionPlay).getArtist(), false, true);
-				}else{
-					MusicPlay(positionPlay);
-				}
+				MusicPlay(positionPlay);
 			}
-			break;
-		default:
-			break;
 		}
     }
-	
+    
     public static void MusicPlay(final int position){
     	isMusicPlaying = false;
-    	if(musicInfo == null || musicInfo.size() == 0){
-    		Toast.makeText(Utils.mContext, "There has no musics now.", Toast.LENGTH_SHORT).show();
-    		return;
-    	}
-    	int totalTime = musicInfo.get(position).getDuration();
-		musicPlaySeekBar.setMax(totalTime);
-		songPath = musicInfo.get(position).getPath();
-		File songFile = new File(songPath);
-		if(!songFile.exists()){
-			UpdateMusicInfo(position);
-			return;
-		}
-		uri = Uri.fromFile(songFile);
-		try{
-			if(mediaPlayer != null){
-				if(mediaPlayer.isPlaying()){
-					mediaPlayer.pause();
-					mediaPlayer.stop();
-				}
-				mediaPlayer.reset();
-				mediaPlayer = null;
+    	if(!Utils.isMusicInfoEmpty()){
+	    	int totalTime = musicInfo.get(position).getDuration();
+			musicPlaySeekBar.setMax(totalTime);
+			songPath = musicInfo.get(position).getPath();
+			File songFile = new File(songPath);
+			if(!songFile.exists()){
+				UpdateMusicInfo(position);
+				return;
 			}
-			mediaPlayer = new MediaPlayer();
-			mediaPlayer.setDataSource(Utils.mContext, uri);
-			mediaPlayer.setOnPreparedListener(new OnPreparedListener() {
-				
-				@Override
-				public void onPrepared(MediaPlayer mp) {
-					mediaPlayer.start();
-					isMusicPlaying = true;
-					positionPlay = position;
-					setMusicViewInfos();
-					updateNotification(musicInfo.get(positionPlay).getTitle(), musicInfo.get(positionPlay).getArtist(), false, true);
+			uri = Uri.fromFile(songFile);
+			try{
+				if(mediaPlayer != null){
+					if(mediaPlayer.isPlaying()){
+						mediaPlayer.pause();
+						mediaPlayer.stop();
+					}
+					mediaPlayer.reset();
+					mediaPlayer = null;
 				}
-			});
-			mediaPlayer.prepareAsync();
-		} catch (IllegalStateException e){
-			e.printStackTrace();
-		} catch (IOException e){
-			e.printStackTrace();
-		}
+				mediaPlayer = new MediaPlayer();
+				mediaPlayer.setDataSource(Utils.mContext, uri);
+				mediaPlayer.setOnPreparedListener(new OnPreparedListener() {
+					
+					@Override
+					public void onPrepared(MediaPlayer mp) {
+						mediaPlayer.start();
+						isMusicPlaying = true;
+						positionPlay = position;
+						setMusicViewInfos();
+						updateNotification(musicInfo.get(positionPlay).getTitle(), musicInfo.get(positionPlay).getArtist(), false, true);
+					}
+				});
+				mediaPlayer.prepareAsync();
+			} catch (IllegalStateException e){
+				e.printStackTrace();
+			} catch (IOException e){
+				e.printStackTrace();
+			}
+    	}
     }
     
     public static void UpdateMusicInfo(int position){
@@ -405,11 +405,9 @@ public class EasyMusicMainActivity extends FragmentActivity{
 	        	}
 	        	Log.i("AudioInfo", String.valueOf(suf));
 	        	musicTimePlay.setText(String.valueOf(pre)+":"+Utils.decimalFormat.format(suf));
-	        	if(musicInfo == null || musicInfo.size() == 0){
-	        		Toast.makeText(Utils.mContext, "There has no musics now.", Toast.LENGTH_SHORT).show();
-	        		return;
+	        	if(!Utils.isMusicInfoEmpty()){
+	        		MusicPlay((positionPlay+1)%musicInfo.size());
 	        	}
-	        	MusicPlay((positionPlay+1)%musicInfo.size());
 			}
 		});
 		musicPlayPause.setBackgroundResource(R.drawable.music_to_start);
